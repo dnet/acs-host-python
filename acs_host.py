@@ -76,7 +76,8 @@ nonces = {} # TODO clear nonces past their validity
 
 def receiver():
     pk, sk, ap = get_key()
-    packets = []
+    app = QtWidgets.QApplication(argv)
+    cb = QApplication.clipboard()
 
     class MyUDPHandler(SocketServer.BaseRequestHandler):
         def handle(self):
@@ -89,24 +90,15 @@ def receiver():
             if validity < time():
                 return
             nonces[nonce] = validity
-            packets.append(payload)
+            cb.setText(payload, cb.Clipboard)
+            if cb.supportsSelection():
+                cb.setText(payload, cb.Selection)
+            if cb.supportsFindBuffer():
+                cb.setText(payload, cb.FindBuffer)
 
     server = SocketServer.UDPServer((HOST, CLIP_PORT), MyUDPHandler)
-    while not packets:
-        server.handle_request()
-
-    set_clipboard_text(packets[0])
-
-
-def set_clipboard_text(value):
-    app = QtWidgets.QApplication(argv)
-    cb = QApplication.clipboard()
-    cb.setText(value, cb.Clipboard)
-    if cb.supportsSelection():
-        cb.setText(value, cb.Selection)
-    if cb.supportsFindBuffer():
-        cb.setText(value, cb.FindBuffer)
-    exit(app.exec_()) # TODO merge with the rest of the functionality
+    Thread(target=server.serve_forever).start()
+    exit(app.exec_())
 
 
 def src2dst(src):
