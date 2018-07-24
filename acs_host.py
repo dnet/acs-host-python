@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from itertools import chain
+from signal import signal, SIGINT, SIG_DFL
 from socket import SOL_SOCKET, SO_BROADCAST
 from subprocess import Popen, PIPE
 from sys import argv, exit
@@ -98,6 +99,7 @@ def receiver():
 
     server = SocketServer.UDPServer((HOST, CLIP_PORT), MyUDPHandler)
     Thread(target=server.serve_forever).start()
+    signal(SIGINT, SIG_DFL)
     exit(app.exec_())
 
 
