@@ -6,6 +6,22 @@ Python and Qt is used to ease cross-platform usage.
 
 **The code is not ready for average users, it's a proof of concept right now.**
 
+Usage
+-----
+
+CLI is the only interface right now, provided by the awesome _Click_ library.
+
+	Usage: acs_host.py [OPTIONS] COMMAND [ARGS]...
+
+	Options:
+	  --help  Show this message and exit.
+
+	Commands:
+	  receiver
+	  register
+
+The receiver runs until you press `Ctrl` + `C`.
+
 Protocol
 --------
 
@@ -62,3 +78,4 @@ Dependencies
  - ipaddress (backported from Python 3, Debian/Ubuntu package: `python-ipaddress`)
  - netifaces (Debian/Ubuntu package: `python-netifaces`)
  - cbor (Debian/Ubuntu package: `python-cbor`)
+ - click (Debian/Ubuntu package: `python-click`)

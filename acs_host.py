@@ -15,6 +15,7 @@ from PyQt5.Qt import QApplication, QClipboard
 from ipaddress import ip_address
 import netifaces
 import pysodium
+import click
 import cbor
 
 HOST = ''
@@ -39,14 +40,18 @@ def get_key():
         s.sync()
     return str(pk), str(sk), ap and str(ap)
 
+@click.group()
+def cli():
+    pass
 
+@cli.command()
 def register():
     # TODO this whole thing could be a GUI
     pk, sk, _ = get_key()
     qrencode = Popen(['qrencode', '-8', '-t', 'ANSIUTF8'], stdin=PIPE)
     qrencode.communicate(pk)
-    print
-    print 'Please scan the above QR code with the app to continue'
+    click.echo()
+    click.echo('Please scan the above QR code with the app to continue')
     packets = []
 
     class MyUDPHandler(SocketServer.BaseRequestHandler):
@@ -70,13 +75,20 @@ def register():
     s = QtCore.QSettings(SETTINGS_ORG, SETTINGS_APP)
     s.setValue(SETTINGS_APP_KEY, QtCore.QByteArray(unsealed))
     s.sync()
-    print 'The app has been associated with this machine, its public key got stored'
+    click.echo('The app has been associated with this machine, its public key got stored')
 
 
 nonces = {} # TODO clear nonces past their validity
 
+@cli.command()
 def receiver():
     pk, sk, ap = get_key()
+
+    if ap is None:
+        click.echo("Error: no public key registered for the app could be found.", err=True)
+        click.echo("You have to register first using the 'register' command.", err=True)
+        exit(1)
+
     app = QtWidgets.QApplication(argv)
     cb = QApplication.clipboard()
 
@@ -100,6 +112,7 @@ def receiver():
     server = SocketServer.UDPServer((HOST, CLIP_PORT), MyUDPHandler)
     Thread(target=server.serve_forever).start()
     signal(SIGINT, SIG_DFL)
+    click.echo("Receiver started, press Ctrl + C to exit")
     exit(app.exec_())
 
 
@@ -125,5 +138,6 @@ def src2dst(src):
 def ip_num(ip):
     return int(ip_address(unicode(ip)))
 
-receiver()
-#register()
+
+if __name__ == '__main__':
+    cli()
