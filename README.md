@@ -27,7 +27,7 @@ Protocol
 
 ### General/common conventions
 
- - _Nonces_ are 48 bytes long and are generated using the NaCl CSPRNG.
+ - _Nonces_ are 24 bytes long and are generated using the NaCl CSPRNG.
  - NaCl Authenticated Encryption (`crypto_box`) requires such a _nonce_,
    the nonce and the box is sent by concatenating the two in the
    following order: `nonce || box`
