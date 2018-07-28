@@ -106,8 +106,6 @@ def receiver():
             cb.setText(payload, cb.Clipboard)
             if cb.supportsSelection():
                 cb.setText(payload, cb.Selection)
-            if cb.supportsFindBuffer():
-                cb.setText(payload, cb.FindBuffer)
 
     server = SocketServer.UDPServer((HOST, CLIP_PORT), MyUDPHandler)
     Thread(target=server.serve_forever).start()
