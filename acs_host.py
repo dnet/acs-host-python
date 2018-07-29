@@ -92,6 +92,20 @@ def receiver():
     app = QtWidgets.QApplication(argv)
     cb = QApplication.clipboard()
 
+    class ClipboardWrapper(QtCore.QObject):
+        signal = QtCore.pyqtSignal(unicode)
+
+        def __init__(self):
+            QtCore.QObject.__init__(self)
+            self.signal.connect(self.copy_string)
+
+        def copy_string(self, value):
+            cb.setText(value, cb.Clipboard)
+            if cb.supportsSelection():
+                cb.setText(value, cb.Selection)
+
+    cw = ClipboardWrapper()
+
     class MyUDPHandler(SocketServer.BaseRequestHandler):
         def handle(self):
             data = self.request[0]
@@ -103,9 +117,7 @@ def receiver():
             if validity < time():
                 return
             nonces[nonce] = validity
-            cb.setText(payload, cb.Clipboard)
-            if cb.supportsSelection():
-                cb.setText(payload, cb.Selection)
+            cw.signal.emit(payload)
 
     server = SocketServer.UDPServer((HOST, CLIP_PORT), MyUDPHandler)
     Thread(target=server.serve_forever).start()
