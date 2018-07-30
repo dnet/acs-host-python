@@ -14,6 +14,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import QApplication, QClipboard
 from ipaddress import ip_address
 import netifaces
+import pynotify
 import pysodium
 import click
 import cbor
@@ -91,6 +92,7 @@ def receiver():
 
     app = QtWidgets.QApplication(argv)
     cb = QApplication.clipboard()
+    pynotify.init("ACS")
 
     class ClipboardWrapper(QtCore.QObject):
         signal = QtCore.pyqtSignal(unicode)
@@ -103,6 +105,7 @@ def receiver():
             cb.setText(value, cb.Clipboard)
             if cb.supportsSelection():
                 cb.setText(value, cb.Selection)
+            pynotify.Notification("Android Clipboard Sync", "Text was copied to the host clipboard").show()
 
     cw = ClipboardWrapper()
 

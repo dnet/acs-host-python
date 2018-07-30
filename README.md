@@ -79,3 +79,4 @@ Dependencies
  - netifaces (Debian/Ubuntu package: `python-netifaces`)
  - cbor (Debian/Ubuntu package: `python-cbor`)
  - click (Debian/Ubuntu package: `python-click`)
+ - pynotify (Debian/Ubuntu package: `python-notify`)
